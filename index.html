@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3498db">
+    <title>Calculadora Costos 3D</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --light-color: #f9f9f9;
+            --dark-color: #333;
+            --border-radius: 8px;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .input-section, .results-section {
+            background-color: var(--light-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+        
+        .section-title {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin-top: 5px;
+        }
+        
+        .range-value {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .final-price {
+            font-size: 24px;
+            color: var(--secondary-color);
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0fff4;
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--secondary-color);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 14px 25px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-calculate {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-calculate:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-reset {
+            background-color: #e0e0e0;
+            color: #666;
+        }
+        
+        .btn-reset:hover {
+            background-color: #d0d0d0;
+        }
+        
+        .currency-note {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        @media (min-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calculadora de Costos de Impresión 3D</h1>
+            <p class="description">Calcula fácilmente el costo total de tus impresiones 3D considerando todos los factores</p>
+        </header>
+        
+        <div class="calculator-grid">
+            <div class="input-section">
+                <h2 class="section-title">Datos de Entrada</h2>
+                
+                <div class="form-group">
+                    <label for="kg-usados">Kg de Filamento Usados</label>
+                    <input type="number" id="kg-usados" min="0" step="0.01" value="0.02">
+                </div>
+                
+                <div class="form-group">
+                    <label for="factor-error">Factor de Error</label>
+                    <input type="number" id="factor-error" min="1" step="0.1" value="1.3">
+                </div>
+                
+                <div class="form-group">
+                    <label for="precio-kg">Precio por Kg de Filamento (sin IVA)</label>
+                    <input type="number" id="precio-kg" min="0" step="0.01" value="299">
+                </div>
+                
+                <div class="form-group">
+                    <label for="horas-impresion">Horas de Impresión</label>
+                    <input type="number" id="horas-impresion" min="0" step="0.1" value="4">
+                </div>
+                
+                <div class="form-group">
+                    <label for="coste-kwh">Coste por KWh ($)</label>
+                    <input type="number" id="coste-kwh" min="0" step="0.0001" value="2.0747">
+                </div>
+                
+                <div class="form-group">
+                    <label for="consumo-kw">Consumo en KW</label>
+                    <input type="number" id="consumo-kw" min="0" step="0.01" value="0.35">
+                </div>
+                
+                <div class="form-group">
+                    <label for="horas-trabajo">Horas de Trabajo</label>
+                    <input type="number" id="horas-trabajo" min="0" step="0.1" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="precio-hora">Precio por Hora de Trabajo ($)</label>
+                    <input type="number" id="precio-hora" min="0" step="0.01" value="42">
+                </div>
+                
+                <div class="form-group">
+                    <label for="mantenimiento">Coste de Mantenimiento ($)</label>
+                    <input type="number" id="mantenimiento" min="0" step="0.01" value="1.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="beneficio">Porcentaje de Beneficio <span id="beneficio-value" class="range-value">15%</span></label>
+                    <input type="range" id="beneficio" min="15" max="30" step="1" value="15">
+                </div>
+                
+                <div class="form-group">
+                    <label for="iva">Porcentaje de IVA <span id="iva-value" class="range-value">16%</span></label>
+                    <input type="range" id="iva" min="0" max="30" step="1" value="16">
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title">Resultados</h2>
+                
+                <div class="result-item">
+                    <span class="result-label">Coste de Filamento:</span>
+                    <span class="result-value" id="coste-filamento">$0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Coste de Electricidad:</span>
+                    <span class="result-value" id="coste-electricidad">$0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Coste de Trabajo:</span>
+                    <span class="result-value" id="coste-trabajo">$0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Subtotal:</span>
+                    <span class="result-value" id="subtotal">$0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">+ Mantenimiento:</span>
+                    <span class="result-value" id="mantenimiento-result">$0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">+ Beneficio:</span>
+                    <span class="result-value" id="beneficio-result">$0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Coste Total (sin IVA):</span>
+                    <span class="result-value" id="coste-total">$0.00</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">IVA (<span id="iva-percent">16</span>%):</span>
+                    <span class="result-value" id="iva-result">$0.00</span>
+                </div>
+                
+                <div class="final-price">
+                    Precio Final: <span id="precio-final">$0.00</span>
+                </div>
+                
+                <p class="currency-note">* Todos los valores están expresados en pesos mexicanos ($)</p>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn-calculate" id="calculate-btn">Calcular</button>
+            <button class="btn-reset" id="reset-btn">Reiniciar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos del DOM
+            const kgUsadosInput = document.getElementById('kg-usados');
+            const factorErrorInput = document.getElementById('factor-error');
+            const precioKgInput = document.getElementById('precio-kg');
+            const horasImpresionInput = document.getElementById('horas-impresion');
+            const costeKwhInput = document.getElementById('coste-kwh');
+            const consumoKwInput = document.getElementById('consumo-kw');
+            const horasTrabajoInput = document.getElementById('horas-trabajo');
+            const precioHoraInput = document.getElementById('precio-hora');
+            const mantenimientoInput = document.getElementById('mantenimiento');
+            const beneficioInput = document.getElementById('beneficio');
+            const beneficioValueSpan = document.getElementById('beneficio-value');
+            const ivaInput = document.getElementById('iva');
+            const ivaValueSpan = document.getElementById('iva-value');
+            const ivaPercentSpan = document.getElementById('iva-percent');
+            
+            const costeFilamentoSpan = document.getElementById('coste-filamento');
+            const costeElectricidadSpan = document.getElementById('coste-electricidad');
+            const costeTrabajoSpan = document.getElementById('coste-trabajo');
+            const subtotalSpan = document.getElementById('subtotal');
+            const mantenimientoResultSpan = document.getElementById('mantenimiento-result');
+            const beneficioResultSpan = document.getElementById('beneficio-result');
+            const costeTotalSpan = document.getElementById('coste-total');
+            const ivaResultSpan = document.getElementById('iva-result');
+            const precioFinalSpan = document.getElementById('precio-final');
+            
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            
+            // Actualizar valor del rango de beneficio
+            beneficioInput.addEventListener('input', function() {
+                beneficioValueSpan.textContent = this.value + '%';
+            });
+            
+            // Actualizar valor del rango de IVA
+            ivaInput.addEventListener('input', function() {
+                ivaValueSpan.textContent = this.value + '%';
+                ivaPercentSpan.textContent = this.value;
+            });
+            
+            // Calcular costos
+            calculateBtn.addEventListener('click', function() {
+                // Obtener valores de entrada
+                const kgUsados = parseFloat(kgUsadosInput.value) || 0;
+                const factorError = parseFloat(factorErrorInput.value) || 0;
+                const precioKg = parseFloat(precioKgInput.value) || 0;
+                const horasImpresion = parseFloat(horasImpresionInput.value) || 0;
+                const costeKwh = parseFloat(costeKwhInput.value) || 0;
+                const consumoKw = parseFloat(consumoKwInput.value) || 0;
+                const horasTrabajo = parseFloat(horasTrabajoInput.value) || 0;
+                const precioHora = parseFloat(precioHoraInput.value) || 0;
+                const mantenimiento = parseFloat(mantenimientoInput.value) || 0;
+                const beneficioPorcentaje = parseFloat(beneficioInput.value) || 0;
+                const ivaPorcentaje = parseFloat(ivaInput.value) || 0;
+                
+                // Calcular costos individuales
+                const costeFilamento = kgUsados * factorError * precioKg;
+                const costeElectricidad = horasImpresion * costeKwh * consumoKw;
+                const costeTrabajo = horasTrabajo * precioHora;
+                
+                // Calcular subtotal
+                const subtotal = costeFilamento + costeElectricidad + costeTrabajo;
+                
+                // Calcular coste total sin IVA
+                const beneficioDecimal = beneficioPorcentaje / 100;
+                const costeTotal = (subtotal + mantenimiento) * (1 + beneficioDecimal);
+                
+                // Calcular IVA y precio final
+                const ivaDecimal = ivaPorcentaje / 100;
+                const iva = costeTotal * ivaDecimal;
+                const precioFinal = costeTotal + iva;
+                
+                // Mostrar resultados
+                costeFilamentoSpan.textContent = '$' + costeFilamento.toFixed(2);
+                costeElectricidadSpan.textContent = '$' + costeElectricidad.toFixed(2);
+                costeTrabajoSpan.textContent = '$' + costeTrabajo.toFixed(2);
+                subtotalSpan.textContent = '$' + subtotal.toFixed(2);
+                mantenimientoResultSpan.textContent = '$' + mantenimiento.toFixed(2);
+                beneficioResultSpan.textContent = '$' + (subtotal * beneficioDecimal).toFixed(2);
+                costeTotalSpan.textContent = '$' + costeTotal.toFixed(2);
+                ivaResultSpan.textContent = '$' + iva.toFixed(2);
+                precioFinalSpan.textContent = '$' + precioFinal.toFixed(2);
+            });
+            
+            // Reiniciar valores
+            resetBtn.addEventListener('click', function() {
+                kgUsadosInput.value = '0.02';
+                factorErrorInput.value = '1.3';
+                precioKgInput.value = '299';
+                horasImpresionInput.value = '4';
+                costeKwhInput.value = '2.0747';
+                consumoKwInput.value = '0.35';
+                horasTrabajoInput.value = '1';
+                precioHoraInput.value = '42';
+                mantenimientoInput.value = '1.1';
+                beneficioInput.value = '15';
+                beneficioValueSpan.textContent = '15%';
+                ivaInput.value = '16';
+                ivaValueSpan.textContent = '16%';
+                ivaPercentSpan.textContent = '16';
+                
+                // Limpiar resultados
+                costeFilamentoSpan.textContent = '$0.00';
+                costeElectricidadSpan.textContent = '$0.00';
+                costeTrabajoSpan.textContent = '$0.00';
+                subtotalSpan.textContent = '$0.00';
+                mantenimientoResultSpan.textContent = '$0.00';
+                beneficioResultSpan.textContent = '$0.00';
+                costeTotalSpan.textContent = '$0.00';
+                ivaResultSpan.textContent = '$0.00';
+                precioFinalSpan.textContent = '$0.00';
+            });
+            
+            // Calcular automáticamente al cargar la página
+            calculateBtn.click();
+            
+            // Guardar datos en almacenamiento local
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // Cargar valores guardados
+                if (localStorage.getItem(input.id)) {
+                    input.value = localStorage.getItem(input.id);
+                }
+            });
+            
+            // Actualizar cálculos cuando cambie cualquier valor
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    calculateBtn.click();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
